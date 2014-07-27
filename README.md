@@ -1,14 +1,14 @@
 ## Powder Model ##
 
-## CV/g of Anodes Made from Cylinders ##
+### CV/g of Anodes Made from Cylinders ###
 
-### CV/g of Cylinders ###
+#### CV/g of Cylinders ####
 
 The capacitance of a cylindrical capacitor is given by:
 
 ![eq 1](./images/eq1.png)
 
-where \\( \epsilon_0 \\) is the permittivity of free space, \\( \epsilon_r \\) is the relative dielectric constant of the metal oxide, \\( L \\) is the length of the cylinder, \\( b \\) is the outer radius and \\( a \\) is the inner radius. The thickness of the dielectric is then \\( b-a \\). The cylinder with dielectric was made by anodizing a cylinder with an orginal radius of \\( R \\).
+where ![ep0](./images/epsilon0.png) is the permittivity of free space, ![epr](./images/epsilonr.png) is the relative dielectric constant of the metal oxide,  L is the length of the cylinder, b is the outer radius and a is the inner radius. The thickness of the dielectric is then b-a. The cylinder with dielectric was made by anodizing a cylinder with an orginal radius of R.
 
 The thickness of the dielectric can be written in terms of the native oxide thickness and the formation constant as:
 
@@ -18,19 +18,19 @@ where \\( \alpha \\) is the formation constant \\( (\mu m/V) \\) and \\( b_0 \\)
 
 The orginal weight of the cylinder is \\( \pi R^2 L \rho_{M} \\). From the above equations, we can derive CV/g:
 
-\\[ \frac{CV_f}{g} = \frac{2\epsilon_0\epsilon_rV_f}{R^2\rho_{M}Ln\left(\frac{a+\alpha V_f+b_0}{a}\right)} \\]
+![eq 3](./images/eq3.png)
 
 Using stoichiometry and rearranging, we can derive an expression for \\( R^2 \\):
 
-\\[ R^2 = X\gamma (b^2-a^2) + a^2 \\]
+![eq 4](./images/eq4.png)
 
 where \\( \gamma = \frac{\rho_{oxide} {MW}_{M}}{\rho_{M} {MW}_{oxide}} \\) and \\( X \\) is the number of moles of metal per mole of oxide.
 
 Subsituting the expression for \\( R^2 \\) into the equation for CV/g gives:
 
-\\[ \frac{CV_f}{g} = \frac{2\epsilon_0\epsilon_rV_f}{(X((a+\alpha V_f + b_0)^2 -a^2)\gamma +a^2) \rho_{M}Ln\left(\frac{a+\alpha V_f + b_0}{a}\right)} \\]
+![eq 5](./images/eq5.png)
 
-### Corrected CV/g of Cylinders ###
+#### Corrected CV/g of Cylinders ####
 
 In the anode made of cylinders, the cylinders touch as shown in this figure (for prismatic cylinders):
 
