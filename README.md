@@ -6,7 +6,7 @@
 
 The capacitance of a cylindrical capacitor is given by:
 
-<img src="http://bit.ly/1otPRbT" align="center" border="0" alt="$$ C = \frac{2\pi\epsilon_0\epsilon_rL}{ln(b/a)} $$" width="92" height="29" />
+\\[ C = \frac{2\pi\epsilon_0\epsilon_rL}{ln(b/a)} \\]
 
 where \\( \epsilon_0 \\) is the permittivity of free space, \\( \epsilon_r \\) is the relative dielectric constant of the metal oxide, \\( L \\) is the length of the cylinder, \\( b \\) is the outer radius and \\( a \\) is the inner radius. The thickness of the dielectric is then \\( b-a \\). The cylinder with dielectric was made by anodizing a cylinder with an orginal radius of \\( R \\).
 
@@ -34,8 +34,7 @@ Subsituting the expression for \\( R^2 \\) into the equation for CV/g gives:
 
 In the anode made of cylinders, the cylinders touch as shown in this figure (for prismatic cylinders):
 
-<img alt='cylinders crossing' src='http://127.0.0.1:8888/notebooks/Documents/BG/Tantalum/Powder/Models/images/cyl-crossing.png'  height=120 width=160>
-
+![cylinders crossing](https://github.com/philiplessner/Powder-Model/blob/master/images/cyl-crossing.png)
 This reduces the surface area of the anode. If we define the parameter:
 
 \\[ n = \frac{L}{d} \\]
@@ -56,8 +55,7 @@ We can also write the corrected \\( \frac{CV}{g} \\) in terms of n:
 
 We can then plot the correction factor \\( \frac{n-1}{n} \\) vs. \\( D_f \\):
 
-<img alt='correction factor' src='http://127.0.0.1:8888/notebooks/Documents/BG/Tantalum/Powder/Models/images/correction.svg'  height=480 width=640>
-
+![correction factor](https://github.com/philiplessner/Powder-Model/blob/master/images/correction.svg)
 Over the portion of the curve that is nearly linear (say ~0.18 to ~0.5) we can fit a line and then write an expression for \\( \frac{CV}{g}_{corrected} \\) vs \\( D_f \\):
 
 \\[ \frac{CV}{g}_{corrected} = -0.712D_f + 0.8529 \\]
