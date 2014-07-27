@@ -14,9 +14,9 @@ The thickness of the dielectric can be written in terms of the native oxide thic
 
 ![eq 2](./images/eq2.png)
 
-where ![alpha](./images/alpha.png) is the formation constant in \\( (\mu m/V) \\) and  b<sub>0</sub>  is the thickness of the native oxide film.
+where ![alpha](./images/alpha.png) is the formation constant in ![umpV](./images/micronpervolt.png)and  b<sub>0</sub>  is the thickness of the native oxide film.
 
-The orginal weight of the cylinder is \\( \pi R^2 L \rho_{M} \\). From the above equations, we can derive CV/g:
+The orginal weight of the cylinder is ![weightcyl](./images/weightcyl.png). From the above equations, we can derive CV/g:
 
 ![eq 3](./images/eq3.png)
 
@@ -24,7 +24,7 @@ Using stoichiometry and rearranging, we can derive an expression for R<sup>2</su
 
 ![eq 4](./images/eq4.png)
 
-where \\( \gamma = \frac{\rho_{oxide} {MW}_{M}}{\rho_{M} {MW}_{oxide}} \\) and X is the number of moles of metal per mole of oxide.
+where ![gamma](./images/gamma.png) and X is the number of moles of metal per mole of oxide.
 
 Subsituting the expression for R<sup>2</sup> into the equation for CV/g gives:
 
@@ -46,17 +46,18 @@ We can write the density of the anode in terms of the density of the metal and n
 
 ![eq 7](./images/eq7.png)
 
-or if we define the fractional density \\( D_f = \frac{D_s}{\rho_M} \\), then:
+or if we define the fractional density ![fracden](./images/fracden.png) then:
 
 ![eq 8](./images/eq8.png)
 
-We can also write the corrected \\( \frac{CV}{g} \\) in terms of n:
+We can also write the corrected CV/g in terms of n:
 
 ![eq 9](./images/eq9.png)
 
-We can then plot the correction factor \\( \frac{n-1}{n} \\) vs. \\( D_f \\):
+We can then plot the correction factor ![corrfac](./images/corrfac.png) vs. D<sub>f</sub> 
 
-![correction factor](https://github.com/philiplessner/Powder-Model/blob/master/images/correction.svg)
-Over the portion of the curve that is nearly linear (say ~0.18 to ~0.5) we can fit a line and then write an expression for \\( \frac{CV}{g}_{corrected} \\) vs \\( D_f \\):
+![correction factor](./images/correction.svg)
+
+Over the portion of the curve that is nearly linear (say ~0.18 to ~0.5) we can fit a line and then write an expression for CV/g<sub>corrected</sub> vs D<sub>f</sub>:
 
 ![eq 10](./images/eq10.png)
