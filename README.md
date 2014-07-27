@@ -14,19 +14,19 @@ The thickness of the dielectric can be written in terms of the native oxide thic
 
 ![eq 2](./images/eq2.png)
 
-where \\( \alpha \\) is the formation constant \\( (\mu m/V) \\) and \\( b_0 \\) is the thickness of the native oxide film.
+where ![alpha](./images/alpha.png) is the formation constant in \\( (\mu m/V) \\) and  b<sub>0</sub>  is the thickness of the native oxide film.
 
 The orginal weight of the cylinder is \\( \pi R^2 L \rho_{M} \\). From the above equations, we can derive CV/g:
 
 ![eq 3](./images/eq3.png)
 
-Using stoichiometry and rearranging, we can derive an expression for \\( R^2 \\):
+Using stoichiometry and rearranging, we can derive an expression for R<sup>2</sup> :
 
 ![eq 4](./images/eq4.png)
 
-where \\( \gamma = \frac{\rho_{oxide} {MW}_{M}}{\rho_{M} {MW}_{oxide}} \\) and \\( X \\) is the number of moles of metal per mole of oxide.
+where \\( \gamma = \frac{\rho_{oxide} {MW}_{M}}{\rho_{M} {MW}_{oxide}} \\) and X is the number of moles of metal per mole of oxide.
 
-Subsituting the expression for \\( R^2 \\) into the equation for CV/g gives:
+Subsituting the expression for R<sup>2</sup> into the equation for CV/g gives:
 
 ![eq 5](./images/eq5.png)
 
@@ -34,28 +34,29 @@ Subsituting the expression for \\( R^2 \\) into the equation for CV/g gives:
 
 In the anode made of cylinders, the cylinders touch as shown in this figure (for prismatic cylinders):
 
-![cylinders crossing](https://github.com/philiplessner/Powder-Model/blob/master/images/cyl-crossing.png)
+![cylinders crossing](./images/cyl-crossing.png)
+
 This reduces the surface area of the anode. If we define the parameter:
 
-\\[ n = \frac{L}{d} \\]
+![eq 6](./images/eq6.png)
 
-where \\( L \\) is the length of the prism and \\( d \\) is its 'diameter'.
+where L is the length of the prism and d is its 'diameter'.
 
-We can write the density of the anode in terms of the density of the metal and \\( n \\):
+We can write the density of the anode in terms of the density of the metal and n:
 
-\\[ D_s = \left(\frac{3}{n^2} - \frac{2}{n^3}\right)\rho_M \\]
+![eq 7](./images/eq7.png)
 
 or if we define the fractional density \\( D_f = \frac{D_s}{\rho_M} \\), then:
 
-\\[ D_f = \left(\frac{3}{n^2} - \frac{2}{n^3}\right) \\]
+![eq 8](./images/eq8.png)
 
 We can also write the corrected \\( \frac{CV}{g} \\) in terms of n:
 
-\\[ \frac{CV}{g}_{corrected} = \frac{(n-1)}{n}\frac{CV}{g}_{ucorrected} \\]
+![eq 9](./images/eq9.png)
 
 We can then plot the correction factor \\( \frac{n-1}{n} \\) vs. \\( D_f \\):
 
 ![correction factor](https://github.com/philiplessner/Powder-Model/blob/master/images/correction.svg)
 Over the portion of the curve that is nearly linear (say ~0.18 to ~0.5) we can fit a line and then write an expression for \\( \frac{CV}{g}_{corrected} \\) vs \\( D_f \\):
 
-\\[ \frac{CV}{g}_{corrected} = -0.712D_f + 0.8529 \\]
+![eq 10](./images/eq10.png)
