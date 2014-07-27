@@ -6,13 +6,13 @@
 
 The capacitance of a cylindrical capacitor is given by:
 
-\\[ C = \frac{2\pi\epsilon_0\epsilon_rL}{ln(b/a)} \\]
+![eq 1](./images/eq1.png)
 
 where \\( \epsilon_0 \\) is the permittivity of free space, \\( \epsilon_r \\) is the relative dielectric constant of the metal oxide, \\( L \\) is the length of the cylinder, \\( b \\) is the outer radius and \\( a \\) is the inner radius. The thickness of the dielectric is then \\( b-a \\). The cylinder with dielectric was made by anodizing a cylinder with an orginal radius of \\( R \\).
 
 The thickness of the dielectric can be written in terms of the native oxide thickness and the formation constant as:
 
-\\[ b-a = \alpha V_f + b_0 \\]
+![eq 2](./images/eq2.png)
 
 where \\( \alpha \\) is the formation constant \\( (\mu m/V) \\) and \\( b_0 \\) is the thickness of the native oxide film.
 
