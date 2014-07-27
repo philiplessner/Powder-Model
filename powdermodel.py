@@ -10,24 +10,59 @@ class PowderModel(object):
 
     '''
     Model an anode made of cylinders and pores
-    Stores the results of the model as a pandas DataFrame in the instance
     '''
 
     def __init__(self, anode_props, met, mat_props):
         '''
         Parameters
-            a: radius of cylinder after anodization (numpy array)
+            anode_props: dictionary
+                a: radius of cylinders after anodization (numpy array)
+                Ds: density of sintered anode (g/cc)
+                ratio_ptc: ratio of pores to cylinders
+                pore_K:
+                lam:
             met: identity of metal (string)
-            Ds: sintered density of anode (g/cc)
-            pore_props: {'ratio_ptc': ratio of pores to cylinders,
-                         'pore_K: ,
-                         'lam': }
+            mat_props: dictionary
+                dielectric constant: relative dielectric constant
+                density of oxide:
+                density of metal:
+                microns per volt: formation constant
+                b0: thickness of native oxide film (microns)
+                Molecular Weight of Metal:
+                Molecular Weight oxide:
+                Gamma:
+                X: Moles of metal per mole of metal oxide
+                Pilling:
         '''
         self.anode_props = anode_props
         self.met = met
         self.mat_props = mat_props
 
     def _model(self, Vf):
+        '''
+        Calculate capacitor properties at a given formation voltage
+        Parameter
+            Vf: formation voltage (volts)
+        Returns
+            dictionary containing input and calculated properties
+                a: (input property) inner radius of cylinders after formation
+                Vf: (input property) formation voltage (volts)
+                Ds: (input property) sintered density of anode (g/cc)
+                b:  outer radius of cylinders after formation (microns)
+                Rsq: square of radius of cylinder before formation
+                R: radius of cylinder before formation (microns)
+                Dnm: diameter of cylinder before formation (nm)
+                CV per g cyl: uC/g of cylinder not corr for sintered density
+                density corr factor: corr factor loss of surface area
+                corrCV per g cyl: uC/g after correction for density
+                Rp: radius of pore (microns)
+                Pnm: diameter of pore (nm)
+                Rpsq: radius of pore squared
+                ap:
+                bp:
+                CV per g pore_cyl: uC/g for cylinder + pore model
+                CV per cc: uC/cc
+        '''
         # Permitivity of free space
         e0 = 8.85e-12
         # Material constants
