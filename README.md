@@ -1,11 +1,3 @@
-<head>
-
-    <script type="text/javascript"
-            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-
-</head>
-
 ## Powder Model ##
 
 ## CV/g of Anodes Made from Cylinders ##
@@ -14,7 +6,7 @@
 
 The capacitance of a cylindrical capacitor is given by:
 
-\\[ C = \frac{2\pi\epsilon_0\epsilon_rL}{ln(b/a)} \\]
+<img src="http://bit.ly/1otPRbT" align="center" border="0" alt="$$ C = \frac{2\pi\epsilon_0\epsilon_rL}{ln(b/a)} $$" width="92" height="29" />
 
 where \\( \epsilon_0 \\) is the permittivity of free space, \\( \epsilon_r \\) is the relative dielectric constant of the metal oxide, \\( L \\) is the length of the cylinder, \\( b \\) is the outer radius and \\( a \\) is the inner radius. The thickness of the dielectric is then \\( b-a \\). The cylinder with dielectric was made by anodizing a cylinder with an orginal radius of \\( R \\).
 
@@ -54,7 +46,7 @@ We can write the density of the anode in terms of the density of the metal and \
 
 \\[ D_s = \left(\frac{3}{n^2} - \frac{2}{n^3}\right)\rho_M \\]
 
-or if we define the fractional density $ D_f = \frac{D_s}{\rho_M} $, then:
+or if we define the fractional density \\( D_f = \frac{D_s}{\rho_M} \\), then:
 
 \\[ D_f = \left(\frac{3}{n^2} - \frac{2}{n^3}\right) \\]
 
@@ -62,7 +54,7 @@ We can also write the corrected \\( \frac{CV}{g} \\) in terms of n:
 
 \\[ \frac{CV}{g}_{corrected} = \frac{(n-1)}{n}\frac{CV}{g}_{ucorrected} \\]
 
-We can then plot the correction factor $ \frac{n-1}{n} $ vs. \\( D_f \\):
+We can then plot the correction factor \\( \frac{n-1}{n} \\) vs. \\( D_f \\):
 
 <img alt='correction factor' src='http://127.0.0.1:8888/notebooks/Documents/BG/Tantalum/Powder/Models/images/correction.svg'  height=480 width=640>
 
