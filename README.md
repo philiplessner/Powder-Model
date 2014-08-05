@@ -56,7 +56,7 @@ We can also write the corrected CV/g in terms of n:
 
 We can then plot the correction factor ![corrfac](./images/corrfac.png) vs. D<sub>f</sub> 
 
-![correction factor](./images/correction.svg)
+![correction factor](./images/correction.png)
 
 Over the portion of the curve that is nearly linear (say ~0.18 to ~0.5) we can fit a line and then write an expression for CV/g<sub>corrected</sub> vs D<sub>f</sub>:
 
