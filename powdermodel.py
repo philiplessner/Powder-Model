@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, division, unicode_literals
+import csv
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 import matplotlib.pyplot as plt
@@ -37,6 +38,8 @@ class PowderModel(object):
         self.anode_props = anode_props
         self.met = met
         self.mat_props = mat_props
+        # cap holds the results of the model after run_model
+        self.cap = None
 
     def _model(self, Vf):
         '''
@@ -116,25 +119,125 @@ class PowderModel(object):
                 'CV per cc': CV_cc}
 
     def run_model(self, V):
+        '''
+        Run the model over a range of voltages.
+        Results are stored in cap
+        Parameter
+            V: ndarray of voltages
+        '''
         for i, Vf in enumerate(reversed(V)):
-            cap = self._model(Vf) if i == 0 else merge_with(np.concatenate,
-                                                            self._model(Vf),
-                                                            cap)
-        return cap
+            self.cap = self._model(Vf) if i == 0 else merge_with(
+                np.concatenate, self._model(Vf), self.cap)
+
+    def make_plots(self):
+        if not self.cap:
+            print('\nRun model before plotting\n')
+        # fontsize=18
+        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
+        majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
+        for z in np.unique(self.cap['Vf']):
+            x = self.cap['Dnm'][self.cap['Vf'] == z]
+            ax[0].plot(x,
+                       self.cap['corrCV per g cyl'][self.cap['Vf'] == z],
+                       label=' '.join(['$V_f =$', unicode(z), 'V']))
+            ax[1].plot(x,
+                       self.cap['CV per cc'][self.cap['Vf'] == z],
+                       label=' '.join(['$V_f =$', unicode(z), 'V']))
+        for e in ax:
+            e.yaxis.set_major_formatter(majorFormatter)
+            e.set_xlabel('Cylinder Diameter (nm)')
+            e.legend()
+        ek = '{:.1f}'.format(self.mat_props[
+                             'dielectric constant'] / (self.mat_props['microns per volt'] * 1000.))
+        Pilling = '{:.3f}'.format(self.mat_props['Pilling'])
+        ax[0].set_title(' '.join([self.met, '(',
+                                  '$\epsilon /k=$', ek,
+                                  ',', 'Pilling=',
+                                  Pilling, ')']))
+        ad = '{:.2f}'.format(self.anode_props['Ds'])
+        ax[1].set_title(' '.join([self.met, '(', '$D_s=$', ad, ')']))
+        ax[0].set_ylabel('CV/g ($\mu C/g$)')
+        ax[1].set_ylabel('CV/cc ($\mu C/cc$)')
+        plt.tight_layout()
+        plt.show()
+        plt.clf()
+
+    def get_dataV(self, V):
+        '''
+        After running model, get results at a given voltage.
+        Parameter
+            V: voltage (volts)
+        Returns
+            dictionary whose values for each key are ndarrays
+            of model results
+        '''
+        return {key: self.cap[key][self.cap['Vf'] == V]
+                for key in self.cap}
+
+    def v_rolloff(self, D):
+        '''
+        Compute CV/g rolloff with Voltage for a given
+        diameter cylinder and plot
+        Parameter
+            D: cylinder diameter (nm)
+        '''
+        Vs = np.unique(self.cap['Vf'])
+        y = []
+        for V in Vs:
+            d = self.get_dataV(V)
+            Ds_gt = d['Dnm'][d['Dnm'] > D]
+            Ds_lt = d['Dnm'][d['Dnm'] < D]
+            # Check if that diameter is available for voltage
+            if Ds_gt.any() and Ds_lt.any():
+                # Use linear interpolation
+                D_gt = Ds_gt[0]
+                CVg_gt = d['corrCV per g cyl'][d['Dnm'] > D][0]
+                D_lt = Ds_lt[-1]
+                CVg_lt = d['corrCV per g cyl'][d['Dnm'] < D][-1]
+                m = (CVg_gt - CVg_lt) / (D_gt - D_lt)
+                CVg = m * (D - D_lt) + CVg_lt
+                print(V, D, CVg)
+                y.append(CVg)
+
+        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
+        majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
+        ax.yaxis.set_major_formatter(majorFormatter)
+        ax.plot([V for V in Vs], y)
+        ax.set_ylabel('CV/g')
+        ax.set_xlabel('$V_f (Volts)$')
+        plt.show()
+        plt.clf()
+
+    def write_csv(self, fpath):
+        '''
+        Write model results to a csv file.
+        Parameters
+            fpath: path to csv file
+        '''
+        col_order = ['a', 'Vf', 'Ds', 'b', 'Rsq', 'R', 'Dnm', 'CV per g cyl',
+                     'density corr factor', 'corrCV per g cyl', 'Rp', 'Pnm',
+                     'Rpsq', 'ap', 'bp', 'CV per g por_cyl', 'CV per cc']
+        with open(fpath, 'w') as f:
+            f.write(','.join([key for key in col_order]))
+            f.write('\n')
+            for i in xrange(0, self.cap['Ds'].shape[0]):
+                s = ','.join([unicode(self.cap[key][i]) for key in col_order])
+                f.write(''.join([s, '\n']))
 
 
 def compare_metals(metals_data, labels, Vf):
     '''
     Compare CV/g and CV/cc for different metals at a given formation voltage
     Parameters
-        metals_data: pandas groups at voltage
+        metals_data: dict with model data at V
         labels: labels for legend
         Vf: voltage corresponding to the groups voltage
     '''
     majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
     fontsize = 18
-    fig, ax = plt.subplots(1, 2, figsize=(20, 5))
-    fig.suptitle(''.join(['$V_f=$',  unicode(Vf), '$V$']), fontsize=fontsize)
+    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+    ax[0].set_title(''.join(['$V_f=$',  unicode(Vf), '$V$']),
+                    fontsize=fontsize)
     for metal_data, label in zip(metals_data, labels):
         ax[0].plot(
             metal_data['Dnm'], metal_data['corrCV per g cyl'], label=label)
@@ -146,7 +249,32 @@ def compare_metals(metals_data, labels, Vf):
         e.legend(loc='best')
         plt.setp(e.get_xticklabels(), fontsize=fontsize - 4)
         plt.setp(e.get_yticklabels(), fontsize=fontsize - 4)
+        e.grid(True)
     ax[0].set_ylabel('CV/g', fontsize=fontsize)
     ax[1].set_ylabel('CV/cc', fontsize=fontsize)
+    plt.tight_layout()
     plt.show()
     return fig, ax
+
+
+def read_props(fpath):
+    '''
+    Read valve metal properties from csv file.
+    Parameter
+        fpath: path to csv file (string)
+    Returns
+        vmp: dictionary of dictinaries
+        {metal1: {prop1: xxx, prop2: yyy},
+        metal2: {prop1: xxx, prop2: yyy}}
+        where the values are floats
+    '''
+    with open(fpath, 'rb') as f:
+        reader = csv.reader(f)
+        data = [row for row in reader]
+    head = data.pop(0)
+    header = head[1:]
+    metals = [ll.pop(0) for ll in data]
+    datan = np.array([[float(datum) for datum in l] for l in data])
+    properties = [dict(zip(header, l)) for l in datan]
+    vmp = dict(zip(metals, properties))
+    return vmp
