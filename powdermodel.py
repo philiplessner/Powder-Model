@@ -4,6 +4,9 @@ import csv
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 import matplotlib.pyplot as plt
+from functools import partial
+from operator import add, mul
+from toolz import pipe
 from toolz.dicttoolz import merge_with
 
 
@@ -225,15 +228,89 @@ class PowderModel(object):
                 f.write(''.join([s, '\n']))
 
 
+class FlakeModel(object):
+
+    '''
+    Model an anode made of flakes
+    '''
+
+    def __init__(self, anode_props, met, mat_props):
+        '''
+        Parameters
+            anode_props: dictionary
+                r0: radius of flakes before anodization
+                t0: thickness of flakes
+                L: array of neck thickness
+                Ds: density of sintered anode (g/cc)
+            met: identity of metal (string)
+            mat_props: dictionary
+                dielectric constant: relative dielectric constant
+                density of oxide:
+                density of metal:
+                microns per volt: formation constant
+                b0: thickness of native oxide film (microns)
+                Molecular Weight of Metal:
+                Molecular Weight oxide:
+                Gamma:
+                X: Moles of metal per mole of metal oxide
+                Pilling:
+        '''
+        self.anode_props = anode_props
+        self.met = met
+        self.mat_props = mat_props
+        # cap holds the results of the model after run_model
+        self.cap = None
+
+    def _flakemodel(self, Vf):
+        e0 = 8.85e-12
+        r0 = self.anode_props['r0']
+        t0 = self.anode_props['t0']
+        Ds = self.anode_props['Ds']
+        L = self.anode_props['L']
+        K = self.mat_props['dielectric constant']
+        rho_m = self.mat_props['density of metal']
+        alpha = self.mat_props['microns per volt']
+        P = self.mat_props['Pilling']
+        r = pipe(L ** 2 * t0 * (L - t0) / 2.,
+                 partial(add, np.sqrt(t0 ** 3 * (4 * L ** 3 * r0 ** 2 -
+                                                 L ** 3 * t0 ** 2 -
+                                                 8 * L ** 2 * r0 ** 2 * t0 +
+                                                 4 * L * r0 ** 2 * t0 ** 2 +
+                                                 4 * r0 ** 2 * t0 ** 3)) / 2),
+                 partial(mul, 1. / (L ** 3 - 2 * L ** 2 * t0 +
+                                    L * t0 ** 2 + t0 ** 3)))
+        d = (t0 - 2 * r) * L / t0 + 2. * r
+        Den = np.pi * (r0 ** 2) * t0 * rho_m / (4. * r ** 2 * (t0 + L)) * 1.e12
+        term = alpha * Vf / P
+        CVg = pipe((r - term) ** 2,
+                   partial(add, ((r - term) * (t0 - 2. * term) +
+                                 (d / 2. - term) *
+                                 (L - 2. * alpha * Vf + 2. * term))),
+                   partial(add, ((d / 2. - term + alpha * Vf) ** 2 * (-1))),
+                   partial(mul, 2. * e0 * K / (alpha * r0 * r0 * t0 * rho_m)))
+        CVcc = CVg * Den
+        gap = L + 2. * term * (1 - P)
+        return {'r': r[d > 0],
+                'd': d[d > 0],
+                'Den': Den[d > 0],
+                'L': L[d > 0],
+                'r0': np.repeat(r0, len(L[d > 0])),
+                't0': np.repeat(t0, len(L[d > 0])),
+                'CV/g': CVg[d > 0],
+                'CV/cc': CVcc[d > 0],
+                'gap': gap[d > 0]}
+
+
 def compare_metals(metals_data, labels, Vf):
     '''
     Compare CV/g and CV/cc for different metals at a given formation voltage
     Parameters
-        metals_data: dict with model data at V
-        labels: labels for legend
-        Vf: voltage corresponding to the groups voltage
+    metals_data: dict with model data at V
+    labels: labels for legend
+    Vf: voltage corresponding to the groups voltage
     '''
-    majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
+    majorFormatter = FuncFormatter(
+        lambda x, pos: '{:,.0f}'.format(x))
     fontsize = 18
     fig, ax = plt.subplots(1, 2, figsize=(12, 6))
     ax[0].set_title(''.join(['$V_f=$',  unicode(Vf), '$V$']),
