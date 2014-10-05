@@ -271,6 +271,7 @@ class FlakeModel(object):
         rho_m = self.mat_props['density of metal']
         alpha = self.mat_props['microns per volt']
         P = self.mat_props['Pilling']
+        # Propeties of sintered anode
         r = pipe(L ** 2 * t0 * (L - t0) / 2.,
                  partial(add, np.sqrt(t0 ** 3 * (4 * L ** 3 * r0 ** 2 -
                                                  L ** 3 * t0 ** 2 -
@@ -281,7 +282,13 @@ class FlakeModel(object):
                                     L * t0 ** 2 + t0 ** 3)))
         d = (t0 - 2 * r) * L / t0 + 2. * r
         Den = np.pi * (r0 ** 2) * t0 * rho_m / (4. * r ** 2 * (t0 + L)) * 1.e12
+        # Properties of formed anode
         term = alpha * Vf / P
+        S = pipe((r - term) ** 2 + (r - term) * (t0 - 2. * term),
+                 partial(
+                     add, (d / 2. - term) * (L - 2. * alpha * Vf + 2. * term)),
+                 partial(add, -1. * (d / 2. - term + alpha * Vf) ** 2),
+                 partial(mul, 2. * np.pi))
         CVg = pipe((r - term) ** 2,
                    partial(add, ((r - term) * (t0 - 2. * term) +
                                  (d / 2. - term) *
@@ -290,15 +297,40 @@ class FlakeModel(object):
                    partial(mul, 2. * e0 * K / (alpha * r0 * r0 * t0 * rho_m)))
         CVcc = CVg * Den
         gap = L + 2. * term * (1 - P)
-        return {'r': r[d > 0],
+        return {'r0': np.repeat(r0, len(L[d > 0])),
+                't0': np.repeat(t0, len(L[d > 0])),
+                'Vf': np.repeat(Vf, len(L[d > 0])),
+                'L': L[d > 0],
+                'r': r[d > 0],
                 'd': d[d > 0],
                 'Den': Den[d > 0],
-                'L': L[d > 0],
-                'r0': np.repeat(r0, len(L[d > 0])),
-                't0': np.repeat(t0, len(L[d > 0])),
+                'S': S[d > 0],
                 'CV/g': CVg[d > 0],
                 'CV/cc': CVcc[d > 0],
                 'gap': gap[d > 0]}
+
+    def run_model(self, V):
+        '''
+        Run the model over a range of voltages.
+        Results are stored in cap
+        Parameter
+            V: ndarray of voltages
+        '''
+        for i, Vf in enumerate(reversed(V)):
+            self.cap = self._flakemodel(Vf) if i == 0 else merge_with(
+                np.concatenate, self._flakemodel(Vf), self.cap)
+
+    def get_dataV(self, V):
+        '''
+        After running model, get results at a given voltage.
+        Parameter
+            V: voltage (volts)
+        Returns
+            dictionary whose values for each key are ndarrays
+            of model results
+        '''
+        return {key: self.cap[key][self.cap['Vf'] == V]
+                for key in self.cap}
 
 
 def compare_metals(metals_data, labels, Vf):
