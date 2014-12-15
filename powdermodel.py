@@ -4,9 +4,8 @@ import csv
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 import matplotlib.pyplot as plt
-from functools import partial
 from operator import add, mul
-from toolz import pipe
+from toolz import thread_first
 from toolz.dicttoolz import merge_with
 
 
@@ -136,6 +135,8 @@ class PowderModel(object):
         if not self.cap:
             print('\nRun model before plotting\n')
         # fontsize=18
+        K = self.mat_props['dielectric constant']
+        alpha = self.mat_props['microns per volt']
         fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
         majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
         for z in np.unique(self.cap['Vf']):
@@ -150,8 +151,7 @@ class PowderModel(object):
             e.yaxis.set_major_formatter(majorFormatter)
             e.set_xlabel('Cylinder Diameter (nm)')
             e.legend()
-        ek = '{:.1f}'.format(self.mat_props[
-                             'dielectric constant'] / (self.mat_props['microns per volt'] * 1000.))
+        ek = '{:.1f}'.format(K / (alpha * 1000.))
         Pilling = '{:.3f}'.format(self.mat_props['Pilling'])
         ax[0].set_title(' '.join([self.met, '(',
                                   '$\epsilon /k=$', ek,
@@ -272,29 +272,30 @@ class FlakeModel(object):
         alpha = self.mat_props['microns per volt']
         P = self.mat_props['Pilling']
         # Propeties of sintered anode
-        r = pipe(L ** 2 * t0 * (L - t0) / 2.,
-                 partial(add, np.sqrt(t0 ** 3 * (4 * L ** 3 * r0 ** 2 -
-                                                 L ** 3 * t0 ** 2 -
-                                                 8 * L ** 2 * r0 ** 2 * t0 +
-                                                 4 * L * r0 ** 2 * t0 ** 2 +
-                                                 4 * r0 ** 2 * t0 ** 3)) / 2),
-                 partial(mul, 1. / (L ** 3 - 2 * L ** 2 * t0 +
-                                    L * t0 ** 2 + t0 ** 3)))
+        r = thread_first(L ** 2 * t0 * (L - t0) / 2.,
+                         (add, np.sqrt(t0 ** 3 * (4 * L ** 3 * r0 ** 2 -
+                                                  L ** 3 * t0 ** 2 -
+                                                  8 * L ** 2 * r0 ** 2 * t0 +
+                                                  4 * L * r0 ** 2 * t0 ** 2 +
+                                                  4 * r0 ** 2 * t0 ** 3)) / 2),
+                         (mul, 1. / (L ** 3 - 2 * L ** 2 * t0 +
+                                     L * t0 ** 2 + t0 ** 3)))
         d = (t0 - 2 * r) * L / t0 + 2. * r
         Den = np.pi * (r0 ** 2) * t0 * rho_m / (4. * r ** 2 * (t0 + L)) * 1.e12
         # Properties of formed anode
         term = alpha * Vf / P
-        S = pipe((r - term) ** 2 + (r - term) * (t0 - 2. * term),
-                 partial(
-                     add, (d / 2. - term) * (L - 2. * alpha * Vf + 2. * term)),
-                 partial(add, -1. * (d / 2. - term + alpha * Vf) ** 2),
-                 partial(mul, 2. * np.pi))
-        CVg = pipe((r - term) ** 2,
-                   partial(add, ((r - term) * (t0 - 2. * term) +
-                                 (d / 2. - term) *
-                                 (L - 2. * alpha * Vf + 2. * term))),
-                   partial(add, ((d / 2. - term + alpha * Vf) ** 2 * (-1))),
-                   partial(mul, 2. * e0 * K / (alpha * r0 * r0 * t0 * rho_m)))
+        S = thread_first((r - term) ** 2,
+                         (add, ((r - term) * (t0 - 2. * term) +
+                                (d / 2. - term) *
+                                (L - 2. * alpha * Vf + 2. * term))),
+                         (add, ((d / 2. - term + alpha * Vf) ** 2 * (-1))),
+                         (mul, 2.e-12 / (r0 * r0 * t0 * rho_m)))
+        CVg = thread_first((r - term) ** 2,
+                           (add, ((r - term) * (t0 - 2. * term) +
+                                  (d / 2. - term) *
+                                  (L - 2. * alpha * Vf + 2. * term))),
+                           (add, ((d / 2. - term + alpha * Vf) ** 2 * (-1))),
+                           (mul, 2. * e0 * K / (alpha * r0 * r0 * t0 * rho_m)))
         CVcc = CVg * Den
         gap = L + 2. * term * (1 - P)
         return {'r0': np.repeat(r0, len(L[d > 0])),
