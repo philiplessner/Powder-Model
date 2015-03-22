@@ -180,13 +180,13 @@ class PowderModel(object):
     def v_rolloff(self, D):
         '''
         Compute CV/g rolloff with Voltage for a given
-        diameter cylinder and plot
+        diameter cylinder
         Parameter
             D: cylinder diameter (nm)
         '''
         Vs = np.unique(self.cap['Vf'])
-        y = []
-        for V in Vs:
+        y = np.zeros(len(Vs))
+        for i, V in enumerate(Vs):
             d = self.get_dataV(V)
             Ds_gt = d['Dnm'][d['Dnm'] > D]
             Ds_lt = d['Dnm'][d['Dnm'] < D]
@@ -199,17 +199,13 @@ class PowderModel(object):
                 CVg_lt = d['corrCV per g cyl'][d['Dnm'] < D][-1]
                 m = (CVg_gt - CVg_lt) / (D_gt - D_lt)
                 CVg = m * (D - D_lt) + CVg_lt
-                print(V, D, CVg)
-                y.append(CVg)
-
-        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
-        majorFormatter = FuncFormatter(lambda x, pos: '{:,.0f}'.format(x))
-        ax.yaxis.set_major_formatter(majorFormatter)
-        ax.plot([V for V in Vs], y)
-        ax.set_ylabel('CV/g')
-        ax.set_xlabel('$V_f (Volts)$')
-        plt.show()
-        plt.clf()
+                # print(V, D, CVg)
+                y[i] = CVg
+            else:
+                y[i] = np.nan
+        return {'D': D,
+                'Vs': Vs,
+                'CVg': y}
 
     def write_csv(self, fpath):
         '''
