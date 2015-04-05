@@ -67,6 +67,7 @@ class PowderModel(object):
                 bp:
                 CV per g pore_cyl: uC/g for cylinder + pore model
                 CV per cc: uC/cc
+                M: mutiplying factor for lkg (vs. flat surface)
         '''
         # Permitivity of free space
         e0 = 8.85e-12
@@ -100,6 +101,7 @@ class PowderModel(object):
                                                          - 4. * ((1 - 2. * gamma) * (t_oxide ** 2) - Rpsq))) / 2.
         bp = ap + t_oxide
         CV_gpore_cyl = (corrCV_gcyl * Rsq) / (Rsq + (pore_K - 1.) * Rpsq * lam)
+        M = CV_gpore_cyl * Rsq * alpha * rho_m / (2. * a * K * e0)
         # CV/cc (if lam == 0, defaults to cylinder model)
         CV_cc = Ds * CV_gpore_cyl
         return {'a': a,
@@ -118,7 +120,8 @@ class PowderModel(object):
                 'ap': ap,
                 'bp': bp,
                 'CV per g por_cyl': CV_gpore_cyl,
-                'CV per cc': CV_cc}
+                'CV per cc': CV_cc,
+                'M': M}
 
     def run_model(self, V):
         '''
